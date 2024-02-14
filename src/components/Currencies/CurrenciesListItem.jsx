@@ -1,15 +1,8 @@
-import React from 'react';
-import css from './CurrenciesList.module.css';
-
-export const CurrenciesListItem = ({ currency, active, onClick }) => {
-  const handleClick = () => {
-    onClick(currency);
-  };
-
+export const CurrenciesListItem = ({ currency, click, active }) => {
   return (
     <li
-      className={`${css.CurrenciesListItem} ${active ? css.active : ''}`}
-      onClick={handleClick}
+      className={`CurrenciesListItem ${active ? 'active' : ''}`}
+      onClick={click}
     >
       {currency}
     </li>

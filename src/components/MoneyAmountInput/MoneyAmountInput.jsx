@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import css from './MoneyAmountInput.module.css';
 
-export const MoneyAmountInput = () => {
-  const [value, setValue] = useState();
+export const MoneyAmountInput = ({ id, value, onInput }) => {
+  const [inputValue, setInputValue] = useState(value || 0);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   const handleInput = event => {
-    setValue(event.target.value);
+    const newValue = event.target.value;
+    if (newValue < 0) {
+      setInputValue(0);
+      onInput(0, id);
+      return;
+    }
+    setInputValue(newValue);
+    onInput(newValue, id);
   };
-
-  if (value < 0) {
-    setValue(0);
-  }
 
   return (
     <input
       className={css.MoneyAmountInput}
       type="number"
-      value={value}
-      onInput={handleInput}
+      value={inputValue}
+      onChange={handleInput}
       placeholder="0"
     />
   );

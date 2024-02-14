@@ -1,28 +1,28 @@
-import React from 'react';
-import css from './CurrenciesList.module.css';
+import React, { useState } from 'react';
 import { CURRENCIES } from 'constants/currencies';
 import { CurrenciesListItem } from './CurrenciesListItem';
+import { CurrenciesListStyle } from './CurrenciesListStyle';
 
-export const CurrenciesList = ({ active, onClick }) => {
-  const handleCurrencyClick = currency => {
-    onClick(currency);
+export const CurrenciesList = ({ onItemClick, activeCurrency }) => {
+  const [selectedCurrency, setSelectedCurrency] = useState(activeCurrency);
+
+  const handleItemClick = currency => {
+    setSelectedCurrency(currency);
+    onItemClick(currency);
   };
 
   return (
-    <ul className={css.CurrenciesList}>
+    <CurrenciesListStyle>
       {Object.keys(CURRENCIES).map(currency => {
-        if (currency !== 'UAH') {
-          return (
-            <CurrenciesListItem
-              key={currency}
-              currency={currency}
-              onClick={() => handleCurrencyClick(currency)}
-              active={currency === active}
-            />
-          );
-        }
-        return null;
+        return (
+          <CurrenciesListItem
+            key={currency}
+            currency={currency}
+            active={currency === selectedCurrency}
+            click={() => handleItemClick(currency)}
+          />
+        );
       })}
-    </ul>
+    </CurrenciesListStyle>
   );
 };
