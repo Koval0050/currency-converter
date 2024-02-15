@@ -4,106 +4,113 @@ import { CURRENCIES } from 'constants/currencies';
 
 import { CurrenciesList } from './Currencies/CurrenciesList';
 import { MoneyAmountInput } from './MoneyAmountInput/MoneyAmountInput';
-import { Container } from './Container/Container';
+import { Container } from './Container';
 
 import './index.css';
 
 export const App = () => {
-  const [currencyData, setCurrencyData] = useState([]);
-  const [activeCurrencyFrom, setActiveCurrencyFrom] = useState('UAH');
-  const [activeCurrencyTo, setActiveCurrencyTo] = useState('USD');
-  const [convertedAmountFrom, setConvertedAmountFrom] = useState(1);
-  const [convertedAmountTo, setConvertedAmountTo] = useState(38.1264);
+  const [currencies, setCurrencies] = useState([]);
 
+  const [fromCurrency, setFromCurrency] = useState(CURRENCIES.UAH);
+  const [toCurrency, setToCurrency] = useState(CURRENCIES.USD);
+  const [convertedAmountFrom, setConvertedAmountFrom] = useState(1);
+  const [convertedAmountTo, setConvertedAmountTo] = useState();
+
+  //отримуємо курси валют
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedData = await getCurrencies();
-      const filteredData = fetchedData.data.filter(
-        currency => CURRENCIES[currency.cc]
-      );
-      setCurrencyData(filteredData);
+      try {
+        const fetchedData = await getCurrencies();
+        const filteredData = fetchedData.data.filter(
+          currency => CURRENCIES[currency.cc]
+        );
+        setCurrencies(filteredData);
+      } catch (error) {
+        console.error('Помилка під час отримання даних:', error);
+      }
     };
     fetchData();
   }, []);
 
+  //встановлюємо значення курсу долара за замовчуванням
+  useEffect(() => {
+    const usdCurrency = currencies.find(
+      currency => currency.cc === CURRENCIES.USD
+    );
+    if (usdCurrency) {
+      setConvertedAmountTo(usdCurrency.rate);
+    }
+  }, [currencies]);
+
+  //отримуємо курс валюти яку обрали
   const getExchangeRate = currencyCode => {
-    const currency = currencyData.find(item => item.cc === currencyCode);
+    const currency = currencies.find(item => item.cc === currencyCode);
     return currency ? currency.rate : 1;
   };
 
+  //функція конвертації
   const calculateConvertedAmount = (amount, fromCurrency, toCurrency) => {
     const fromRate = getExchangeRate(fromCurrency);
     const toRate = getExchangeRate(toCurrency);
-    console.log('fromRate - ', fromRate);
-    console.log('toRate - ', toRate);
-    if (fromCurrency === 'UAH') {
-      const amountUAH = amount / toRate;
-      return amountUAH.toFixed(4);
+
+    if (fromCurrency === CURRENCIES.UAH) {
+      return (amount / toRate).toFixed(4);
     } else {
-      const result = (amount * fromRate) / toRate;
-      return result.toFixed(4);
+      return ((amount * fromRate) / toRate).toFixed(4);
     }
   };
 
-  const handleCurrencyChange = (currency, listType) => {
-    if (listType === 'from') {
-      setActiveCurrencyFrom(currency);
-      setConvertedAmountFrom(
-        calculateConvertedAmount(
-          convertedAmountFrom,
-          activeCurrencyTo,
-          currency
-        )
-      );
-    } else if (listType === 'to') {
-      setActiveCurrencyTo(currency);
-      setConvertedAmountTo(
-        calculateConvertedAmount(
-          convertedAmountTo,
-          activeCurrencyFrom,
-          currency
-        )
-      );
-    }
+  //Функції зміни валюти
+  const handleFromCurrencyChange = currency => {
+    setFromCurrency(currency);
+
+    setConvertedAmountFrom(
+      calculateConvertedAmount(convertedAmountFrom, fromCurrency, currency)
+    );
   };
 
-  const handleAmountInputChange = (newValue, inputId) => {
-    if (inputId === 'amountFrom') {
-      setConvertedAmountFrom(newValue);
-      setConvertedAmountFrom(
-        calculateConvertedAmount(newValue, activeCurrencyFrom, activeCurrencyTo)
-      );
-    } else if (inputId === 'amountTo') {
-      setConvertedAmountTo(newValue);
+  const handleToCurrencyChange = currency => {
+    setToCurrency(currency);
 
-      setConvertedAmountTo(
-        calculateConvertedAmount(newValue, activeCurrencyTo, activeCurrencyFrom)
-      );
-    }
+    setConvertedAmountTo(
+      calculateConvertedAmount(convertedAmountTo, toCurrency, currency)
+    );
+  };
+
+  //функції зміни суми у полях вводу
+  const handleAmountInputChangeFrom = newValue => {
+    setConvertedAmountFrom(
+      calculateConvertedAmount(newValue, fromCurrency, toCurrency)
+    );
+    console.log('from: ', convertedAmountFrom);
+  };
+  const handleAmountInputChangeTo = newValue => {
+    setConvertedAmountTo(
+      calculateConvertedAmount(newValue, toCurrency, fromCurrency)
+    );
+    console.log('To: ', convertedAmountTo);
   };
 
   return (
     <div className="appContainer">
       <Container>
         <CurrenciesList
-          onItemClick={currency => handleCurrencyChange(currency, 'from')}
-          activeCurrency={activeCurrencyFrom}
+          onClick={handleFromCurrencyChange}
+          activeCurrency={fromCurrency}
         />
         <MoneyAmountInput
-          id="amountFrom"
           value={convertedAmountTo}
-          onInput={newValue => handleAmountInputChange(newValue, 'amountFrom')}
+          onInput={handleAmountInputChangeFrom}
         />
       </Container>
       <Container>
         <CurrenciesList
-          onItemClick={currency => handleCurrencyChange(currency, 'to')}
-          activeCurrency={activeCurrencyTo}
+          onClick={handleToCurrencyChange}
+          activeCurrency={toCurrency}
         />
         <MoneyAmountInput
-          id="amountTo"
           value={convertedAmountFrom}
-          onInput={newValue => handleAmountInputChange(newValue, 'amountTo')}
+          onInput={handleAmountInputChangeTo}
         />
       </Container>
     </div>

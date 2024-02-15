@@ -10,6 +10,5 @@
 }
 .MoneyAmountInput::-webkit-inner-spin-button,
 .MoneyAmountInput::-webkit-outer-spin-button {
-  /* width: 15px; */
   height: 50px;
 }

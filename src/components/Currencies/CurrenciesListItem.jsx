@@ -1,10 +1,8 @@
-export const CurrenciesListItem = ({ currency, click, active }) => {
-  return (
-    <li
-      className={`CurrenciesListItem ${active ? 'active' : ''}`}
-      onClick={click}
-    >
-      {currency}
-    </li>
-  );
-};
+export const CurrenciesListItem = ({ currency, onClick, isActive }) => (
+  <li
+    className={`CurrenciesListItem ${isActive ? 'active' : ''}`}
+    onClick={onClick}
+  >
+    {currency}
+  </li>
+);

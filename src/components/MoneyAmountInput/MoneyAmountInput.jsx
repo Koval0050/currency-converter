@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import css from './MoneyAmountInput.module.css';
 
-export const MoneyAmountInput = ({ id, value, onInput }) => {
-  const [inputValue, setInputValue] = useState(value || 0);
-
+export const MoneyAmountInput = memo(({ value, onInput }) => {
+  const [inputValue, setInputValue] = useState(value || 1);
   useEffect(() => {
-    setInputValue(value);
+    console.log('value: ', value);
+    setInputValue(value || 1);
   }, [value]);
 
-  const handleInput = event => {
-    const newValue = event.target.value;
+  const onChange = ({ target }) => {
+    let newValue = target.value;
     if (newValue < 0) {
-      setInputValue(0);
-      onInput(0, id);
-      return;
+      newValue = 0;
     }
     setInputValue(newValue);
-    onInput(newValue, id);
+    onInput(newValue);
   };
 
   return (
@@ -24,8 +22,25 @@ export const MoneyAmountInput = ({ id, value, onInput }) => {
       className={css.MoneyAmountInput}
       type="number"
       value={inputValue}
-      onChange={handleInput}
+      onChange={onChange}
       placeholder="0"
     />
   );
-};
+});
+
+// export const MoneyAmountInput = memo(({ value, onInput }) => {
+//   const onChange = ({ target }) => {
+//     const newValue = target.value;
+//     onInput(newValue);
+//   };
+
+//   return (
+//     <input
+//       className={css.MoneyAmountInput}
+//       type="number"
+//       defaultValue={value}
+//       onChange={onChange}
+//       placeholder="0"
+//     />
+//   );
+// });

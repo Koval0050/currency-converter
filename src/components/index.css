@@ -17,10 +17,8 @@ body {
   justify-content: center;
   column-gap: 100px;
   width: 1000px;
-  /* height: 300px; */
   margin: 100px auto;
   padding: 30px;
-
   border-radius: 15px;
   background-color: #fff;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
