@@ -13,8 +13,8 @@ export const App = () => {
 
   const [fromCurrency, setFromCurrency] = useState(CURRENCIES.UAH);
   const [toCurrency, setToCurrency] = useState(CURRENCIES.USD);
-  const [convertedAmountFrom, setConvertedAmountFrom] = useState(1);
-  const [convertedAmountTo, setConvertedAmountTo] = useState();
+  const [convertedAmountFrom, setConvertedAmountFrom] = useState();
+  const [convertedAmountTo, setConvertedAmountTo] = useState(1);
 
   //отримуємо курси валют
   useEffect(() => {
@@ -38,7 +38,7 @@ export const App = () => {
       currency => currency.cc === CURRENCIES.USD
     );
     if (usdCurrency) {
-      setConvertedAmountTo(usdCurrency.rate);
+      setConvertedAmountFrom(usdCurrency.rate);
     }
   }, [currencies]);
 
@@ -56,6 +56,11 @@ export const App = () => {
     if (fromCurrency === CURRENCIES.UAH) {
       return (amount / toRate).toFixed(4);
     } else {
+      
+      console.log('amount', amount);
+      console.log('fromRate', fromRate);
+      console.log('toRate', toRate);
+
       return ((amount * fromRate) / toRate).toFixed(4);
     }
   };
@@ -63,32 +68,35 @@ export const App = () => {
   //Функції зміни валюти
   const handleFromCurrencyChange = currency => {
     setFromCurrency(currency);
-
-    setConvertedAmountFrom(
-      calculateConvertedAmount(convertedAmountFrom, fromCurrency, currency)
+    const amount = calculateConvertedAmount(
+      convertedAmountFrom,
+      currency,
+      toCurrency
     );
+    setConvertedAmountTo(amount);
   };
 
   const handleToCurrencyChange = currency => {
     setToCurrency(currency);
-
-    setConvertedAmountTo(
-      calculateConvertedAmount(convertedAmountTo, toCurrency, currency)
+    const amount = calculateConvertedAmount(
+      convertedAmountFrom,
+      fromCurrency,
+      currency
     );
+
+    setConvertedAmountTo(amount);
   };
 
   //функції зміни суми у полях вводу
   const handleAmountInputChangeFrom = newValue => {
-    setConvertedAmountFrom(
-      calculateConvertedAmount(newValue, fromCurrency, toCurrency)
-    );
-    console.log('from: ', convertedAmountFrom);
+    setConvertedAmountFrom(newValue);
+    const amount = calculateConvertedAmount(newValue, fromCurrency, toCurrency);
+    setConvertedAmountTo(amount);
   };
   const handleAmountInputChangeTo = newValue => {
-    setConvertedAmountTo(
-      calculateConvertedAmount(newValue, toCurrency, fromCurrency)
-    );
-    console.log('To: ', convertedAmountTo);
+    setConvertedAmountTo(newValue);
+    const amount = calculateConvertedAmount(newValue, toCurrency, fromCurrency);
+    setConvertedAmountFrom(amount);
   };
 
   return (
@@ -99,7 +107,7 @@ export const App = () => {
           activeCurrency={fromCurrency}
         />
         <MoneyAmountInput
-          value={convertedAmountTo}
+          value={convertedAmountFrom}
           onInput={handleAmountInputChangeFrom}
         />
       </Container>
@@ -109,7 +117,7 @@ export const App = () => {
           activeCurrency={toCurrency}
         />
         <MoneyAmountInput
-          value={convertedAmountFrom}
+          value={convertedAmountTo}
           onInput={handleAmountInputChangeTo}
         />
       </Container>

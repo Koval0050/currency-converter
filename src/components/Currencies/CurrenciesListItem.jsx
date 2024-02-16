@@ -1,7 +1,9 @@
 export const CurrenciesListItem = ({ currency, onClick, isActive }) => (
   <li
     className={`CurrenciesListItem ${isActive ? 'active' : ''}`}
-    onClick={onClick}
+    onClick={() => {
+      onClick(currency);
+    }}
   >
     {currency}
   </li>
