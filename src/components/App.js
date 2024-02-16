@@ -54,14 +54,17 @@ export const App = () => {
     const toRate = getExchangeRate(toCurrency);
 
     if (fromCurrency === CURRENCIES.UAH) {
-      return (amount / toRate).toFixed(4);
+      let result = (amount / toRate).toFixed(4);
+      if (Number.isInteger(parseFloat(result))) {
+        result = parseInt(result);
+      }
+      return result;
     } else {
-      
-      console.log('amount', amount);
-      console.log('fromRate', fromRate);
-      console.log('toRate', toRate);
-
-      return ((amount * fromRate) / toRate).toFixed(4);
+      let result = ((amount * fromRate) / toRate).toFixed(4);
+      if (Number.isInteger(parseFloat(result))) {
+        result = parseInt(result);
+      }
+      return result;
     }
   };
 
